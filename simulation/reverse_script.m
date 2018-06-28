@@ -5,7 +5,7 @@ imageSizeX = 640;
 imageSizeY = 480;
 [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeY);
 phaseImage = zeros(size(columnsInImage));
-phaseImage(100,200) = 1;phaseImage(400,100) = 1;%manually create two point sources
+phaseImage(100,200) = 40;phaseImage(400,100) = 40;%manually create two point sources
 %the code below is to find the coordinates of the point created manually
 hLocalMax = vision.LocalMaximaFinder;
       hLocalMax.MaximumNumLocalMaxima = 2;%TODO: make this automatic int the future
@@ -24,14 +24,18 @@ for i = 1:size(location,1)%adapts to the number of local maxima
     centerY = location(i,2);
     array2D = (int16(rowsInImage) - int16(centerY)).^2 ...
     + (int16(columnsInImage) - int16(centerX)).^2;
-    ringPixels = ringPixels+ (array2D >= innerRadius.^2 & array2D <= outerRadius.^2);
+    while 1
+        ringPixels = ringPixels+ (array2D >= innerRadius.^2 & array2D <= outerRadius.^2);
+        if(phaseImage(centerX,centerY)-2*pi<=0)
+            break;
+        end
+        innerRadius = outerRadius+20;
+        outerRadius = outerRadius+40;
+    end
 end
 centerX = 320;
 centerY = 240;
 
-
-innerRadius1 = 80;
-outerRadius1 = 100;
 
 % ringPixels is a 2D "logical" array.
 % Now, display it.
