@@ -1,0 +1,11 @@
+clc;clear all;
+load('pattern.mat');
+D_prime = padarray(D_prime,[700 700],0,'both');
+D1 = circshift(D_prime,[-530,100]);
+D2 = circshift(D_prime,[-350,100]);
+D3 = circshift(D_prime,[530,75]);
+D4 = circshift(D_prime,[300,100]);
+D5 = circshift(D_prime,[0,0]);
+D6 = circshift(D_prime,[0,150]);
+D = D1+D2+D3+D4+D5+D6;
+figure;imshow(D);
