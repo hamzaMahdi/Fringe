@@ -33,7 +33,7 @@ for i = 1:size(location,1)%adapts to the number of local maxima
             break;
         end
         innerRadius = outerRadius+20;
-        outerRadius = outerRadius+40-k*4;
+        outerRadius = outerRadius+40-exp(1)^(-(k-5)^2/(2*4))*20;%the 20 is a factor to amplify the gaussian function effect
         k = k+1;
     end
 end
