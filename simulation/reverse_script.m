@@ -1,12 +1,29 @@
- % Create a logical image of a ring with specified
+%this script starts from a RI modification and produces wrapped phase then
+%proceeds to unwrap the produced matrix and calculate the resultant RI
+%modification in order to compare it to the original which enables
+%determination of effectiveness of used unwrapping algorithm
+
+
+%below are parameters used in the conversion from RI to unwrapped phase 
+CPL =0.010000;%10 mm
+alpha = 36.000;%degrees
+WL = 650.0000*10^-9;%wave length
+
+%unwrapped =  WL/(cos(alpha/2))/CPL/RI
+
+% Create a logical image of a ring with specified
 % inner diameter, outer diameter center, and image size.
 % First create the image.
 imageSizeX = 640;
 imageSizeY = 480;
 [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeY);
 phaseImage = zeros(size(columnsInImage));
-phaseImage(100,200) = 30;phaseImage(400,100) = 20;%manually create two point sources
-phaseImage(300,400) = 10;
+phaseImage(100,200) = 0.0030;phaseImage(400,100) =   0.0020;%manually create two point sources
+phaseImage(300,400) =  9.8438e-04;
+figure;imagesc(phaseImage);
+phaseImage = phaseImage/( WL/(cos(alpha/2))/CPL);colormap gray
+%%
+phaseImage(phaseImage==Inf) = 0; %ensures zeroes stay as zeroes
 %the code below is to find the coordinates of the point created manually
 hLocalMax = vision.LocalMaximaFinder;
       hLocalMax.MaximumNumLocalMaxima = 3;%TODO: make this automatic int the future
@@ -37,7 +54,7 @@ for i = 1:size(location,1)%adapts to the number of local maxima
         k = k+1;
     end
 end
-imagesc(ringPixels);colormap(gray(256))
+figure;imagesc(ringPixels);colormap(gray(256))
 title('final wrapped phase information (reverse process)');
 figure;imagesc(phaseImage);
 hold on;plot(200,100,'ow');plot(100,400,'ow');plot(400,300,'ow');
@@ -51,12 +68,10 @@ BW = imregionalmax(unwrapped);
 unwrapped1 = unwrapped .* BW;
 unwrapped1 = imhmax(unwrapped1,max(max(unwrapped1)-0.001));%this thresholds a second time to clear the image completely
 
-CPL =0.01;%10 mm
-alpha = 36;%degrees
-WL = 650*10^-9;%wave length
+
 RI = unwrapped1 * WL/(cos(alpha/2))/CPL;
 figure;
-a = subplot(3,2,[1 ; 4]);imagesc(ringPixels);title("original");colormap(a, gray);
-subplot(3,2,5);
-mesh(unwrapped);title("mathematical unwrapping");colormap default;
-subplot(3,2,6);mesh(RI);title("point source refractive index modification");
+
+
+imagesc(unwrapped);title("mathematical unwrapping");colormap default;
+figure;mesh(RI);title("point source refractive index modification");
